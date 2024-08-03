@@ -1,14 +1,24 @@
 package entities;
 
 import java.util.Random;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+import javax.swing.*;
 
 import entities.personagens.Chefao;
 import entities.personagens.Monstro;
 
-public class Tabuleiro {
+public class Tabuleiro extends JFrame {
     private Casa[][] tabuleiro = new Casa[5][10];
-    private int CHANCE_ARMADILHA = 20;
+    private int CHANCE_ARMADILHA = 15;
     private int CHANCE_ARMADILHA_ALEATORIA = 20;
+    private int posicaoX = 0;
+    private int posicaoY = 0;
+
+    JPanel pTela = new JPanel( new GridLayout(5, 10));
     
     // gerando o tabuleiro
     public Tabuleiro(Personagem personagem) {
@@ -28,7 +38,6 @@ public class Tabuleiro {
                     }
                 } else {
                     this.tabuleiro[i][j] = new Casa();
-
                 }
             }
         }
@@ -37,22 +46,46 @@ public class Tabuleiro {
             int num = random.nextInt(10);
             // se for a linha do chefão
             if (i == 4) {
-                // se a posição sorteada da ultima linha não estiver ocupada
-                if (!tabuleiro[i][num].isOcupado()) {
-                    this.tabuleiro[i][num] = new Casa( new Chefao(100, 100, 1000));
-                } else {
-                    num = random.nextInt(10);
-                    this.tabuleiro[i][num] = new Casa( new Chefao(100, 100, 1000));
-                }
+                this.tabuleiro[i][num] = new Casa( new Chefao(100, 100, 1000));
             } else {
-                if (!tabuleiro[i][num].isOcupado()) {
-                    this.tabuleiro[i][num] = new Casa( new Monstro(100, 100, 150));
-                }else {
-                    num = random.nextInt(10);
-                    this.tabuleiro[i][num] = new Casa( new Monstro(100, 100, 150));
+                if (i == 0 && num == 0) {
+                    // não deixa colocar um monstro na primeira posição
+                    num = num + 2;
                 }
+                this.tabuleiro[i][num] = new Casa( new Monstro(100, 100, 150));
             }
         }
+        configuraJanela();
+
+        addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e){
+                moverJogador(e.getKeyCode());
+            }
+        });
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+    }
+
+    private void configuraJanela(){
+        setTitle("Tabuleiro");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(600,600);
+        setLocationRelativeTo(null);
+
+        JLabel label = new JLabel("teste");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        setLayout(new BorderLayout());
+
+        add(label, BorderLayout.NORTH);
+
+        for (int i = 0; i < tabuleiro.length; i++) {
+            for (int j = 0; j < tabuleiro[i].length; j++) {
+                pTela.add(tabuleiro[i][j]);
+            }
+        }
+        add(pTela, BorderLayout.CENTER);
+        setVisible(true);
     }
 
     public boolean probabilidade(int chance) {
@@ -69,6 +102,44 @@ public class Tabuleiro {
                 System.out.print(tabuleiro[i][j].toString() + "\t");
             }
             System.out.println();
+        }
+    }
+
+    private void moverJogador(int keyCode){
+        int novoX = posicaoX;
+        int novoY = posicaoY;
+
+        switch (keyCode) {
+            case KeyEvent.VK_UP:
+                if (posicaoX > 0) novoX--;
+                break;
+            case KeyEvent.VK_DOWN:
+                if (posicaoX < tabuleiro.length - 1) novoX++;
+                break;
+            case KeyEvent.VK_LEFT:
+                if (posicaoY > 0) novoY--;
+                break;
+            case KeyEvent.VK_RIGHT:
+                if (posicaoY < tabuleiro[0].length - 1) novoY++;
+                break;
+        }
+
+        if (novoX != posicaoX || novoY != posicaoY) {
+            Casa atual = tabuleiro[posicaoX][posicaoY];
+            Casa nova = tabuleiro[novoX][novoY];
+
+            if (nova.isOcupado()) {
+                
+            }
+
+            nova.setConteudo(atual.getPersonagem());
+
+            atual.setConteudo(null);
+
+            posicaoX = novoX;
+            posicaoY = novoY;
+
+            pTela.repaint();
         }
     }
 }

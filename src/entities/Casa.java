@@ -1,6 +1,17 @@
 package entities;
 
-public class Casa {
+import java.awt.Color;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+
+import entities.personagens.Barbaro;
+import entities.personagens.Chefao;
+import entities.personagens.Guerreiro;
+import entities.personagens.Monstro;
+import entities.personagens.Paladino;
+
+public class Casa extends JButton{
     private Personagem personagem;
     private Armadilha armadilha;
     private boolean ocupado = false;
@@ -12,12 +23,24 @@ public class Casa {
         this.personagem = personagem;
         this.armadilha = null;
         this.ocupado = true;
+
+        String temp = getTipoPersonagem(personagem);
+        if (temp == "J"){
+            ImageIcon icon = new ImageIcon("img/warrior.png");
+            setIcon(icon);
+            setBackground(Color.GREEN);
+        }
+        
     }
 
     public Casa(Armadilha armadilha) {
+        ImageIcon icon = new ImageIcon("img/bomb.png");
+        setIcon(icon);
+
         this.personagem = null;
         this.armadilha = armadilha;
         this.ocupado = true;
+        setBackground(Color.RED);
     }
 
     public Personagem getPersonagem() {
@@ -39,6 +62,44 @@ public class Casa {
 
     public void setOcupado(boolean ocupado) {
         this.ocupado = ocupado;
+    }
+
+    public String getTipoPersonagem(Personagem personagem) {
+        if (personagem instanceof Chefao) {
+            ImageIcon icon = new ImageIcon("img/chefao.png");
+            setIcon(icon);
+            setBackground(Color.CYAN);
+            return "C";
+        } else if (personagem instanceof Monstro) {
+            ImageIcon icon = new ImageIcon("img/monstro.png");
+            setIcon(icon);
+            setBackground(Color.ORANGE);
+            return "M";
+        } else if (personagem instanceof Guerreiro){
+            ImageIcon icon = new ImageIcon("img/warrior.png");
+            setIcon(icon);
+            setBackground(Color.GREEN);
+            return "G";
+        } else if (personagem instanceof Paladino){
+            ImageIcon icon = new ImageIcon("img/paladin.png");
+            setIcon(icon);
+            setBackground(Color.GREEN);
+            return "P";
+        } else if (personagem instanceof Barbaro){
+            ImageIcon icon = new ImageIcon("img/barbaro.png");
+            setIcon(icon);
+            setBackground(Color.GREEN);
+            return "B";
+        }
+        return "N";
+    }
+
+    public void setConteudo(Personagem personagem){
+        this.personagem = personagem;
+        if (getTipoPersonagem(personagem) == "N") {
+            setIcon(null);
+            setBackground(null);
+        }
     }
 
     @Override
