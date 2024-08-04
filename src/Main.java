@@ -29,6 +29,41 @@ public class Main {
         });
     }
 }
+/*
+ * 
+ *      import javax.swing.*;
+import java.awt.*;
+
+public class Armadilha {
+    public static void main(String[] args) {
+        JFrame frameArmadilha = new JFrame("Armadilha");
+        frameArmadilha.setSize(300, 200);
+        frameArmadilha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameArmadilha.setLocationRelativeTo(null);
+
+        JPanel painel = new JPanel();
+        frameArmadilha.add(painel); // Adiciona o painel ao JFrame
+
+        // Cria as labels e define o layout do painel
+        painel.setLayout(new BorderLayout());
+        JLabel legenda = new JLabel("Você encontrou uma armadilha:");
+        JLabel legenda2 = new JLabel("Você encontrou uma armadilaaaha:");
+        painel.add(legenda, BorderLayout.NORTH);
+        painel.add(legenda2, BorderLayout.CENTER);
+
+        frameArmadilha.setVisible(true);
+    }
+}
+
+ * 
+ * 
+ */
+
+
+
+
+
+
 
 class Board extends JPanel {
     private int[][] grid;

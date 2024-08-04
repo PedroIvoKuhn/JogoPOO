@@ -19,6 +19,7 @@ public class Tabuleiro extends JFrame {
     private int posicaoY = 0;
 
     JPanel pTela = new JPanel( new GridLayout(5, 10));
+    JLabel informacoes;
     
     // gerando o tabuleiro
     public Tabuleiro(Personagem personagem) {
@@ -55,7 +56,7 @@ public class Tabuleiro extends JFrame {
                 this.tabuleiro[i][num] = new Casa( new Monstro(100, 100, 150));
             }
         }
-        configuraJanela();
+        configuraJanela(personagem);
 
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e){
@@ -66,18 +67,21 @@ public class Tabuleiro extends JFrame {
         setFocusTraversalKeysEnabled(false);
     }
 
-    private void configuraJanela(){
+    private void configuraJanela(Personagem personagem){
         setTitle("Tabuleiro");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(600,600);
         setLocationRelativeTo(null);
 
-        JLabel label = new JLabel("teste");
-        label.setHorizontalAlignment(SwingConstants.CENTER);
+        String rotulo = "   Saúde: "  + personagem.getSaude() +
+                        "   Ataque: " + personagem.getAtaque() +
+                        "   Defesa: " + personagem.getDefesa();
+        informacoes = new JLabel(rotulo);
+        informacoes.setHorizontalAlignment(SwingConstants.CENTER);
 
         setLayout(new BorderLayout());
 
-        add(label, BorderLayout.NORTH);
+        add(informacoes, BorderLayout.NORTH);
 
         for (int i = 0; i < tabuleiro.length; i++) {
             for (int j = 0; j < tabuleiro[i].length; j++) {
@@ -129,7 +133,10 @@ public class Tabuleiro extends JFrame {
             Casa nova = tabuleiro[novoX][novoY];
 
             if (nova.isOcupado()) {
-                
+                if (nova.getArmadilha() != null) {
+                    achoArmadilha(atual.getPersonagem(), nova.getArmadilha());
+                    nova.removeArmadilha();
+                }
             }
 
             nova.setConteudo(atual.getPersonagem());
@@ -141,5 +148,30 @@ public class Tabuleiro extends JFrame {
 
             pTela.repaint();
         }
+    }
+
+    private void achoArmadilha(Personagem personagem, Armadilha armadilha){
+        JFrame frameArmadilha = new JFrame("Armadilha");
+        frameArmadilha.setSize(300, 200);
+        frameArmadilha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameArmadilha.setLocationRelativeTo(null);
+
+        JPanel painel = new JPanel();
+        painel.setLayout(new BorderLayout());
+        
+        String texto = "Você encontrou uma armadilha:";
+        JLabel legenda = new JLabel(texto);
+        legenda.setHorizontalAlignment(SwingConstants.CENTER);
+        painel.add(legenda, BorderLayout.NORTH);
+        
+        String texto2 = "Dano: " + armadilha.getDano();
+        JLabel legenda2 = new JLabel(texto2);
+        legenda2.setHorizontalAlignment(SwingConstants.CENTER);
+        painel.add(legenda2, BorderLayout.CENTER);
+
+        personagem.levaDano(armadilha.getDano());
+        
+        frameArmadilha.add(painel);
+        frameArmadilha.setVisible(true);
     }
 }

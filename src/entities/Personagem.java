@@ -48,6 +48,10 @@ public abstract class Personagem {
         this.nome = nome;
     }
 
+    public void levaDano(int dano) {
+        this.saude -= dano;
+    }
+
     public abstract void habilidade();
 
     @Override
