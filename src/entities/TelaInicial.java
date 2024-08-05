@@ -1,4 +1,4 @@
-import entities.Tabuleiro;
+package entities;
 import entities.personagens.Barbaro;
 import entities.personagens.Guerreiro;
 import entities.personagens.Paladino;
@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class TelaInicial extends JFrame {
+public class TelaInicial extends JFrame {
     public TelaInicial() {
         setTitle("Bem-vindo!");
         setSize(300, 200);

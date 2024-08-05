@@ -5,14 +5,20 @@ public abstract class Personagem {
     private int defesa;
     private int saude;
     private String nome;
+    private int ataqueInicial;
+    private int defesaInicial;
+    private int saudeInicial;
 
     public Personagem() {
     }
 
     public Personagem(int ataque, int defesa, int saude, String nome) {
         this.ataque = ataque;
+        this.ataqueInicial = ataque;
         this.defesa = defesa;
+        this.defesaInicial = defesa;
         this.saude = saude;
+        this.saudeInicial = saude;
         this.nome = nome;
     }
 
@@ -52,10 +58,18 @@ public abstract class Personagem {
         this.saude -= dano;
     }
 
+    public void redefinirValores() {
+        this.saude = this.saudeInicial;
+        this.defesa = this.defesaInicial;
+        this.ataque = this.ataqueInicial;
+    }
+
     public abstract void habilidade();
 
     @Override
     public String toString() {
-        return  nome;
+        return  "   Saúde: "  + getSaude() +
+                "   Ataque: " + getAtaque() +
+                "   Defesa: " + getDefesa();
     }
 }

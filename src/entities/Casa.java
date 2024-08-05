@@ -94,7 +94,7 @@ public class Casa extends JButton{
         return "N";
     }
 
-    public void setConteudo(Personagem personagem){
+    public void setPersonagem(Personagem personagem){
         this.personagem = personagem;
         if (getTipoPersonagem(personagem) == "N") {
             setIcon(null);

@@ -17,7 +17,7 @@ public class Armadilha {
 
     @Override
     public String toString() {
-        return "[Bomba]";
+        return "Dano: " + getDano();
     }
     
 }
