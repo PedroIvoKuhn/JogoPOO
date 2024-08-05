@@ -15,9 +15,10 @@ import entities.personagens.Monstro;
 public class Tabuleiro extends JFrame {
     private Casa[][] tabuleiro = new Casa[5][10];
     private Casa[][] backupTabuleiro = new Casa[5][10];
-    private int CHANCE_ARMADILHA = 15;
+    private int CHANCE_CENARIO = 15;
+    private int CHANCE_ELIXIR = 45;
     private int CHANCE_ARMADILHA_ALEATORIA = 20;
-    private int DANO_BASE = 10;
+    private int DANO_BASE = 111;
     private int posicaoX = 0;
     private int posicaoY = 0;
 
@@ -32,13 +33,18 @@ public class Tabuleiro extends JFrame {
                 if (i == 0 && j == 0) {
                     // inicia o personagem na primeira casa
                     this.tabuleiro[i][j] = new Casa(personagem);
-                } else if (probabilidade(CHANCE_ARMADILHA)) {
-                    // adiciona armadilha de acordo com a probabilidade
-                    if (probabilidade(CHANCE_ARMADILHA_ALEATORIA)) {
-                        // adiciona um numero aleatorio entre 0 e 50
-                        this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE + random.nextInt(51)));
+                    // adiciona armadilha ou elixir de acordo com a probabilidade
+                } else if (probabilidade(CHANCE_CENARIO)) {
+                    if (probabilidade(CHANCE_ELIXIR)) {
+                        this.tabuleiro[i][j] = new Casa( new Elixir(100));
                     } else {
-                        this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE));
+                        // se não for elixir é armadilha
+                        if (probabilidade(CHANCE_ARMADILHA_ALEATORIA)) {
+                            // adiciona um numero aleatorio entre 0 e 50
+                            this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE + random.nextInt(51)));
+                        } else {
+                            this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE));
+                        }
                     }
                 } else {
                     this.tabuleiro[i][j] = new Casa();
@@ -120,18 +126,26 @@ public class Tabuleiro extends JFrame {
             Casa nova = tabuleiro[novoX][novoY];
     
             if (nova.isOcupado()) {
-                // se achar armadilha se não é personagem
-                if (nova.getArmadilha() != null) {
-                    achouArmadilha(atual.getPersonagem(), nova.getArmadilha());
-                    nova.removeArmadilha();
-                } else { // mais um if para colocar o elixir
-                    achouInimigo(atual.getPersonagem(), nova.getPersonagem());
+                switch (nova.getTipoConteudo()) {
+                    case "P":   // Personagem
+                        achouInimigo(atual.getPersonagem(), nova.getPersonagem());
+                        break;
+                    case "A":   // Armadilha
+                        achouArmadilha(atual.getPersonagem(), nova.getArmadilha());
+                        nova.removeArmadilha();
+                        break;
+                    case "E":   // Elixir
+                        achouElixir(atual.getPersonagem(), nova.getElixir());
+                        break;
+                    default:
+                        break;
                 }
             }
     
             nova.setPersonagem(atual.getPersonagem());
     
             atual.setPersonagem(null);
+            atual.setOcupado(false);
     
             posicaoX = novoX;
             posicaoY = novoY;
@@ -180,7 +194,7 @@ public class Tabuleiro extends JFrame {
     }
 
     private void achouInimigo(Personagem personagem, Personagem inimigo){
-        JFrame frameBatalha = new JFrame("Armadilha");
+        JFrame frameBatalha = new JFrame("Inimigo");
         frameBatalha.setSize(300, 200);
         frameBatalha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameBatalha.setLocationRelativeTo(null);
@@ -201,6 +215,40 @@ public class Tabuleiro extends JFrame {
         if (personagem.getSaude() <= 0) {
             telafinal("Fim de Jogo. Você Morreu!");
         }
+        
+        JButton botaoFechar = new JButton("Sair");
+        botaoFechar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 frameBatalha.dispose();
+            }
+        });
+
+        painel.add(botaoFechar, BorderLayout.SOUTH);
+        frameBatalha.add(painel);
+        frameBatalha.setVisible(true);
+    }
+
+    private void achouElixir(Personagem personagem, Elixir elixir){
+        JFrame frameBatalha = new JFrame("Elixir");
+        frameBatalha.setSize(300, 200);
+        frameBatalha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameBatalha.setLocationRelativeTo(null);
+
+        JPanel painel = new JPanel();
+        painel.setLayout(new BorderLayout());
+        
+        String texto = "Você encontrou um Elixir";
+        JLabel legenda = new JLabel(texto);
+        legenda.setHorizontalAlignment(SwingConstants.CENTER);
+        painel.add(legenda, BorderLayout.NORTH);
+        
+        String texto2 = "O Elixir foi adicionado ao seu inventario.";
+        JLabel legenda2 = new JLabel(texto2);
+        legenda2.setHorizontalAlignment(SwingConstants.CENTER);
+        painel.add(legenda2, BorderLayout.CENTER);
+
+        personagem.addElixir(elixir);
         
         JButton botaoFechar = new JButton("Sair");
         botaoFechar.addActionListener(new ActionListener() {
@@ -277,6 +325,8 @@ public class Tabuleiro extends JFrame {
 
     private void reiniciarJogo() {
         this.tabuleiro = copiarTabuleiro(this.backupTabuleiro);
+        printTabuleiro();
+        System.out.println("restaurado do back");
         this.posicaoX = 0;
         this.posicaoY = 0;
         this.tabuleiro[0][0].getPersonagem().redefinirValores();
@@ -291,13 +341,19 @@ public class Tabuleiro extends JFrame {
         Casa[][] copia = new Casa[original.length][original[0].length];
         for (int i = 0; i < original.length; i++) {
             for (int j = 0; j < original[i].length; j++) {
-                if (original[i][j] != null){
-                    Armadilha temp = original[i][j].getArmadilha();
-                    if (temp != null) {
-                        copia[i][j] = new Casa(temp);
-                    } else { // mais um if para colocar o elixir
+                switch (original[i][j].getTipoConteudo()) {
+                    case "P":   // Personagem
                         copia[i][j] = new Casa(original[i][j].getPersonagem());
-                    }
+                        break;
+                    case "A":   // Armadilha
+                        copia[i][j] = new Casa(original[i][j].getArmadilha());
+                        break;
+                    case "E":   // Elixir
+                        copia[i][j] = new Casa(original[i][j].getElixir());
+                        break;
+                    default:
+                        copia[i][j] = new Casa();
+                        break;
                 }
             }
         }

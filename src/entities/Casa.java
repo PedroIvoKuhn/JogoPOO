@@ -14,6 +14,7 @@ import entities.personagens.Paladino;
 public class Casa extends JButton{
     private Personagem personagem;
     private Armadilha armadilha;
+    private Elixir elixir;
     private boolean ocupado = false;
     
     public Casa() {
@@ -22,10 +23,11 @@ public class Casa extends JButton{
     public Casa(Personagem personagem) {
         this.personagem = personagem;
         this.armadilha = null;
+        this.elixir = null;
         this.ocupado = true;
 
         String temp = getTipoPersonagem(personagem);
-        if (temp == "J"){
+        if (temp == "N"){ // se por agum motivo não for uma das opções o icone sera do guerreiro
             ImageIcon icon = new ImageIcon("img/warrior.png");
             setIcon(icon);
             setBackground(Color.GREEN);
@@ -43,12 +45,27 @@ public class Casa extends JButton{
         setBackground(Color.RED);
     }
 
+    public Casa(Elixir elixir) {
+        ImageIcon icon = new ImageIcon("img/elixir.png");
+        setIcon(icon);
+
+        this.personagem = null;
+        this.armadilha = null;
+        this.elixir = elixir;
+        this.ocupado = true;
+        setBackground(Color.GRAY);
+    }
+
     public Personagem getPersonagem() {
         return personagem;
     }
 
     public Armadilha getArmadilha() {
         return armadilha;
+    }
+
+    public Elixir getElixir() {
+        return elixir;
     }
 
     public void removeArmadilha() {
@@ -102,6 +119,19 @@ public class Casa extends JButton{
         }
     }
 
+    public String getTipoConteudo(){
+        if (this.personagem != null) {
+            return "P";
+        }
+        if (this.armadilha != null) {
+            return "A";
+        }
+        if (this.elixir != null) {
+            return "E";
+        }
+        return "Null";
+    }
+
     @Override
     public String toString() {
         String temp = "[]";
@@ -110,6 +140,9 @@ public class Casa extends JButton{
         }
         if (getArmadilha() != null) {
             temp = getArmadilha().toString();
+        }
+        if (getElixir() != null) {
+            temp = getElixir().toString();
         }
         return temp;
     }

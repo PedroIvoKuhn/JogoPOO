@@ -1,13 +1,17 @@
 package entities;
 
+import java.util.ArrayList;
 public abstract class Personagem {
     private int ataque;
     private int defesa;
     private int saude;
     private String nome;
+
     private int ataqueInicial;
     private int defesaInicial;
     private int saudeInicial;
+
+    private ArrayList<Elixir> elixires = new ArrayList<Elixir>();
 
     public Personagem() {
     }
@@ -62,6 +66,18 @@ public abstract class Personagem {
         this.saude = this.saudeInicial;
         this.defesa = this.defesaInicial;
         this.ataque = this.ataqueInicial;
+    }
+
+    public Elixir getElixir(){
+        if (elixires.size()> 0) {
+            return elixires.get(0);
+        }
+        return null;
+    }
+
+    public void addElixir(Elixir elixir){
+        elixires.add(elixir);
+        System.out.println(elixires);
     }
 
     public abstract void habilidade();
