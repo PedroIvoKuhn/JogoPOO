@@ -7,7 +7,7 @@ public class Chefao extends Personagem {
     }
 
     public Chefao(int ataque, int defesa, int saude) {
-        super(ataque, defesa, saude, "Chefao");
+        super(ataque, defesa, saude, "chefao");
     }
     
     // Caso queira adicionar uma habilidade futuramente

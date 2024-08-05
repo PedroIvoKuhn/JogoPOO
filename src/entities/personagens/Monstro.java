@@ -7,7 +7,7 @@ public class Monstro extends Personagem {
     }
 
     public Monstro(int ataque, int defesa, int saude) {
-        super(ataque, defesa, saude, "Monstro");
+        super(ataque, defesa, saude, "monstro");
     }
     
     // Caso queira adicionar uma habilidade futuramente

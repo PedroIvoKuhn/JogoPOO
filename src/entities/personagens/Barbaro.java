@@ -7,7 +7,7 @@ public class Barbaro extends Personagem {
     }
 
     public Barbaro(int ataque, int defesa, int saude) {
-        super(ataque, defesa, saude, "Bárbaro");
+        super(ataque, defesa, saude, "barbaro");
     }
 
     @Override

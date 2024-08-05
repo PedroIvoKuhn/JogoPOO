@@ -28,7 +28,7 @@ public class Casa extends JButton{
 
         String temp = getTipoPersonagem(personagem);
         if (temp == "N"){ // se por agum motivo não for uma das opções o icone sera do guerreiro
-            ImageIcon icon = new ImageIcon("img/warrior.png");
+            ImageIcon icon = new ImageIcon("img/guerreiro.png");
             setIcon(icon);
             setBackground(Color.GREEN);
         }
@@ -93,12 +93,12 @@ public class Casa extends JButton{
             setBackground(Color.ORANGE);
             return "M";
         } else if (personagem instanceof Guerreiro){
-            ImageIcon icon = new ImageIcon("img/warrior.png");
+            ImageIcon icon = new ImageIcon("img/guerreiro.png");
             setIcon(icon);
             setBackground(Color.GREEN);
             return "G";
         } else if (personagem instanceof Paladino){
-            ImageIcon icon = new ImageIcon("img/paladin.png");
+            ImageIcon icon = new ImageIcon("img/paladino.png");
             setIcon(icon);
             setBackground(Color.GREEN);
             return "P";

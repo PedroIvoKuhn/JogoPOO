@@ -2,6 +2,7 @@ package entities;
 
 import java.util.Random;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,10 +16,10 @@ import entities.personagens.Monstro;
 public class Tabuleiro extends JFrame {
     private Casa[][] tabuleiro = new Casa[5][10];
     private Casa[][] backupTabuleiro = new Casa[5][10];
-    private int CHANCE_CENARIO = 15;
+    private int CHANCE_CENARIO = 20;
     private int CHANCE_ELIXIR = 45;
     private int CHANCE_ARMADILHA_ALEATORIA = 20;
-    private int DANO_BASE = 111;
+    private int DANO_BASE = 11;
     private int posicaoX = 0;
     private int posicaoY = 0;
 
@@ -195,45 +196,162 @@ public class Tabuleiro extends JFrame {
 
     private void achouInimigo(Personagem personagem, Personagem inimigo){
         JFrame frameBatalha = new JFrame("Inimigo");
-        frameBatalha.setSize(300, 200);
+        frameBatalha.setSize(400, 400);
         frameBatalha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameBatalha.setLocationRelativeTo(null);
 
         JPanel painel = new JPanel();
         painel.setLayout(new BorderLayout());
+
+        JPanel painelInicial = new JPanel();
+
+        painelInicial.setLayout(new GridLayout(2,1));
         
         String texto = "Você encontrou um Inimigo:";
         JLabel legenda = new JLabel(texto);
         legenda.setHorizontalAlignment(SwingConstants.CENTER);
-        painel.add(legenda, BorderLayout.NORTH);
+        painelInicial.add(legenda);
+
+        ImageIcon iconPersonagem = new ImageIcon("./img/" + personagem.getNome() + ".png");
+        JLabel infoPersonagem = new JLabel(personagem.toString(), iconPersonagem, SwingConstants.CENTER);
+        painelInicial.add(infoPersonagem);
+
+        painel.add(painelInicial, BorderLayout.NORTH);
         
         String texto2 = inimigo.toString();
+        ImageIcon iconInimigo= new ImageIcon("./img/" + inimigo.getNome() + ".png");
+        JLabel infoInimigo = new JLabel(texto2, iconInimigo, SwingConstants.CENTER);
+        infoInimigo.setHorizontalAlignment(SwingConstants.CENTER);
+        painel.add(infoInimigo, BorderLayout.CENTER);
+
+        JButton elixir = new JButton("Ingerir Elixir");
+        JButton atacar = new JButton("Atacar");
+        JButton habilidade = new JButton("Usar Habilidade Especial");
+        JPanel painelBotoes = new JPanel();
+
+        painelBotoes.setLayout(new FlowLayout(FlowLayout.CENTER));
+        painelBotoes.add(elixir);
+        painelBotoes.add(atacar);
+        painelBotoes.add(habilidade);
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String acao = e.getActionCommand();
+                try {
+                    switch (acao) {
+                        case "Ingerir Elixir":
+                        personagem.tomarElixir();
+                        infoPersonagem.setText(personagem.toString());
+                        break;
+                        case "Atacar":
+                        // cuidar habilidades
+                        atacar(personagem, inimigo);
+                        infoPersonagem.setText(personagem.toString());
+                        infoInimigo.setText(inimigo.toString());
+
+                        if (personagem.getSaude() <= 0) {
+                            frameBatalha.dispose();
+                            telafinal("Você morreu em combate!");
+                        }
+
+                        if (inimigo.getSaude() <= 0) {
+                            JFrame frameVitoria = new JFrame("Inimigo");
+                            frameVitoria.setSize(400, 400);
+                            frameVitoria.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                            frameVitoria.setLocationRelativeTo(null);
+
+                            JLabel vitoria = new JLabel("Você derrotou o inimigo!");
+                            vitoria.setHorizontalAlignment(SwingConstants.CENTER);
+                            frameVitoria.add(vitoria);
+                            frameBatalha.dispose();
+                            frameVitoria.setVisible(true);
+                        }
+
+                        break;
+                        case "Usar Habilidade Especial":
+                        personagem.habilidade();
+                        infoPersonagem.setText(personagem.toString());
+                        habilidade.setEnabled(false);
+                        break;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }  
+            }
+        };
+
+        elixir.addActionListener(actionListener);
+        atacar.addActionListener(actionListener);
+        habilidade.addActionListener(actionListener);
+
+        painel.add(painelBotoes, BorderLayout.SOUTH);
+        frameBatalha.add(painel);
+        frameBatalha.setVisible(true);
+    }
+/*
+ *  Matar um monstro  ganhar algum atributo aleatorio (vida, defesa, ataque)
+ *  
+ *  Durante o ataque, duas opções:
+ *  - Atacar
+ *      primeiro = ataca sorteando um numero de 0 a W e somando ao seu valor de ataque
+ *      segundo = se defende sorteando um numero de 0 a W e somando ao seu valor de defesa
+ *          O dano é o valor do ataque menos o valor da defesa
+ *              dano > 0 segundo leva
+ *              dano < 0 primeiro leva
+ * 
+ *      Só acaba quando algum morrer
+ *  - Usar habilidade especial
+ *  - ingerir elixir
+ */
+
+    private void atacar(Personagem personagem, Personagem inimigo){
+        Random random = new Random();
+        int ataque = personagem.getAtaque() + random.nextInt(50);
+        int defesa = inimigo.getDefesa() + random.nextInt(50);
+        int dano = ataque - defesa;
+
+        JFrame frameAtaque = new JFrame("Ataque");
+        frameAtaque.setSize(500, 200);
+        frameAtaque.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameAtaque.setLocationRelativeTo(null);
+
+        JPanel painel = new JPanel();
+        painel.setLayout(new BorderLayout());
+        
+        String texto = "Você atacou o inimigo...";
+        JLabel legenda = new JLabel(texto);
+        legenda.setHorizontalAlignment(SwingConstants.CENTER);
+        painel.add(legenda, BorderLayout.NORTH);
+        
+        String texto2 = "O inimigo levou " + dano + " de dano!";
+        if (dano < 0) {
+            dano = Math.abs(dano);
+            texto2 = "O inimigo conseguiu se defender e você levou " + dano + " de dano!";
+            personagem.levaDano(dano);  
+        } else {
+            inimigo.levaDano(dano);
+        }
         JLabel legenda2 = new JLabel(texto2);
         legenda2.setHorizontalAlignment(SwingConstants.CENTER);
         painel.add(legenda2, BorderLayout.CENTER);
-
-        if (personagem.getSaude() <= 0) {
-            telafinal("Fim de Jogo. Você Morreu!");
-        }
         
         JButton botaoFechar = new JButton("Sair");
         botaoFechar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                 frameBatalha.dispose();
+                 frameAtaque.dispose();
             }
         });
-
         painel.add(botaoFechar, BorderLayout.SOUTH);
-        frameBatalha.add(painel);
-        frameBatalha.setVisible(true);
+        frameAtaque.add(painel);
+        frameAtaque.setVisible(true);
     }
 
     private void achouElixir(Personagem personagem, Elixir elixir){
-        JFrame frameBatalha = new JFrame("Elixir");
-        frameBatalha.setSize(300, 200);
-        frameBatalha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameBatalha.setLocationRelativeTo(null);
+        JFrame frameElixir = new JFrame("Elixir");
+        frameElixir.setSize(300, 200);
+        frameElixir.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameElixir.setLocationRelativeTo(null);
 
         JPanel painel = new JPanel();
         painel.setLayout(new BorderLayout());
@@ -254,13 +372,13 @@ public class Tabuleiro extends JFrame {
         botaoFechar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                 frameBatalha.dispose();
+                 frameElixir.dispose();
             }
         });
 
         painel.add(botaoFechar, BorderLayout.SOUTH);
-        frameBatalha.add(painel);
-        frameBatalha.setVisible(true);
+        frameElixir.add(painel);
+        frameElixir.setVisible(true);
     }
 
     private void telafinal(String mensagem) {

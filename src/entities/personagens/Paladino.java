@@ -13,7 +13,7 @@ public class Paladino extends Personagem {
     }
 
     public Paladino(int ataque, int defesa, int saude) {
-        super(ataque, defesa, saude, "Paladino");
+        super(ataque, defesa, saude, "paladino");
         this.qtdDeVida = (int) (saude * 0.5);
     }
     

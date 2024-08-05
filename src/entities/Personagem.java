@@ -69,8 +69,9 @@ public abstract class Personagem {
     }
 
     public Elixir getElixir(){
-        if (elixires.size()> 0) {
-            return elixires.get(0);
+        System.out.println(elixires.size());
+        if (elixires.size() > 0) {
+            return elixires.remove(0);
         }
         return null;
     }
@@ -78,6 +79,12 @@ public abstract class Personagem {
     public void addElixir(Elixir elixir){
         elixires.add(elixir);
         System.out.println(elixires);
+    }
+
+    public void tomarElixir(){
+        if (!elixires.isEmpty()) {
+            this.saude += getElixir().getVida();
+        }
     }
 
     public abstract void habilidade();
