@@ -6,6 +6,7 @@ public abstract class Personagem {
     private int defesa;
     private int saude;
     private String nome;
+    private Boolean usouHabilidade = false;
 
     private int ataqueInicial;
     private int defesaInicial;
@@ -62,6 +63,15 @@ public abstract class Personagem {
         this.saude -= dano;
     }
 
+    public Boolean getUsouHabilidade() {
+        return usouHabilidade;
+    }
+
+    public void setUsouHabilidade(Boolean usouHabilidade) {
+        this.usouHabilidade = usouHabilidade;
+    }
+
+
     public void redefinirValores() {
         this.saude = this.saudeInicial;
         this.defesa = this.defesaInicial;
@@ -88,6 +98,7 @@ public abstract class Personagem {
     }
 
     public abstract void habilidade();
+    public abstract void retirarHabilidade();
 
     @Override
     public String toString() {

@@ -19,7 +19,13 @@ public class Paladino extends Personagem {
     
     @Override
     public void habilidade() {
+        setUsouHabilidade(true);
         setSaude(getSaude() + getqtdDeVida());
+    }
+
+    @Override
+    public void retirarHabilidade() {
+        setUsouHabilidade(false);
     }
 
 }

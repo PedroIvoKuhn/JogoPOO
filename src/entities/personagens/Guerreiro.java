@@ -3,7 +3,7 @@ package entities.personagens;
 import entities.Personagem;
 
 public class Guerreiro extends Personagem {
-    private int rodadas;
+    private int rodada;
     private int defesaAnterior;
 
     public Guerreiro() {
@@ -11,21 +11,28 @@ public class Guerreiro extends Personagem {
 
     public Guerreiro(int ataque, int defesa, int saude) {
         super(ataque, defesa, saude, "guerreiro");
-        this.rodadas = 0;
+        this.rodada = 0;
+    }
+
+    public int getRodada() {
+        return rodada;
+    }
+
+    public void setRodada(int rodada) {
+        this.rodada = rodada;
     }
 
     @Override
     public void habilidade() {
-        if (rodadas == 0) {
-            this.defesaAnterior = getDefesa();
-            setDefesa((int) (getDefesa() * 1.5));
-        }
-        // -1 por causa do rodadas++ no final
-        if (rodadas == 2) {
-            setDefesa(this.defesaAnterior);
-            rodadas = -1;
-        }
-        rodadas++;
+        this.defesaAnterior = getDefesa();
+        setUsouHabilidade(true);
+        setDefesa((int) (getDefesa() * 1.5));
+    }
+
+    @Override
+    public void retirarHabilidade() {
+        setUsouHabilidade(false);
+        setDefesa(this.defesaAnterior);
     }
     
 }

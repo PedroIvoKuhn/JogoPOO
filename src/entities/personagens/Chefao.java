@@ -14,5 +14,8 @@ public class Chefao extends Personagem {
     @Override
     public void habilidade() {
     }
+    @Override
+    public void retirarHabilidade() {
+    }
     
 }

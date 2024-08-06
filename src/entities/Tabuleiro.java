@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import entities.personagens.Chefao;
+import entities.personagens.Guerreiro;
 import entities.personagens.Monstro;
 
 
@@ -19,9 +20,10 @@ public class Tabuleiro extends JFrame {
     private int CHANCE_CENARIO = 20;
     private int CHANCE_ELIXIR = 45;
     private int CHANCE_ARMADILHA_ALEATORIA = 20;
-    private int DANO_BASE = 11;
+    private int DANO_BASE = 111;
     private int posicaoX = 0;
     private int posicaoY = 0;
+    int rodadas = 0;
 
     JPanel pTela = new JPanel( new GridLayout(5, 10));
     JLabel informacoes;
@@ -245,6 +247,7 @@ public class Tabuleiro extends JFrame {
                         break;
                         case "Atacar":
                         // cuidar habilidades
+                        rodadas++;
                         atacar(personagem, inimigo);
                         infoPersonagem.setText(personagem.toString());
                         infoInimigo.setText(inimigo.toString());
@@ -255,8 +258,9 @@ public class Tabuleiro extends JFrame {
                         }
 
                         if (inimigo.getSaude() <= 0) {
-                            JFrame frameVitoria = new JFrame("Inimigo");
-                            frameVitoria.setSize(400, 400);
+                            rodadas = 0;
+                            JFrame frameVitoria = new JFrame("Vitória");
+                            frameVitoria.setSize(250, 200);
                             frameVitoria.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                             frameVitoria.setLocationRelativeTo(null);
 
@@ -267,9 +271,23 @@ public class Tabuleiro extends JFrame {
                             frameVitoria.setVisible(true);
                         }
 
+                        if (personagem.getUsouHabilidade()) {
+                            if (personagem instanceof Guerreiro) {
+                                int rodadaAtual = ((Guerreiro)personagem).getRodada() + 2;
+                                if (rodadas == rodadaAtual) {
+                                    personagem.retirarHabilidade();
+                                }
+                            } else {
+                                personagem.retirarHabilidade();
+                            }
+                            infoPersonagem.setText(personagem.toString());
+                        }
                         break;
                         case "Usar Habilidade Especial":
                         personagem.habilidade();
+                        if (personagem instanceof Guerreiro) {
+                            ((Guerreiro)personagem).setRodada(rodadas);
+                        }
                         infoPersonagem.setText(personagem.toString());
                         habilidade.setEnabled(false);
                         break;
@@ -447,7 +465,6 @@ public class Tabuleiro extends JFrame {
         System.out.println("restaurado do back");
         this.posicaoX = 0;
         this.posicaoY = 0;
-        this.tabuleiro[0][0].getPersonagem().redefinirValores();
 
         this.remove(informacoes);
         this.remove(pTela);
@@ -461,7 +478,9 @@ public class Tabuleiro extends JFrame {
             for (int j = 0; j < original[i].length; j++) {
                 switch (original[i][j].getTipoConteudo()) {
                     case "P":   // Personagem
-                        copia[i][j] = new Casa(original[i][j].getPersonagem());
+                        Personagem temp = original[i][j].getPersonagem();
+                        temp.redefinirValores();
+                        copia[i][j] = new Casa(temp);
                         break;
                     case "A":   // Armadilha
                         copia[i][j] = new Casa(original[i][j].getArmadilha());

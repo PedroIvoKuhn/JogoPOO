@@ -15,4 +15,8 @@ public class Monstro extends Personagem {
     public void habilidade() {
     }
     
+    @Override
+    public void retirarHabilidade() {
+    }
+    
 }
