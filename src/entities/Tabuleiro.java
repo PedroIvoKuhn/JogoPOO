@@ -247,8 +247,14 @@ public class Tabuleiro extends JFrame {
                         break;
                         case "Atacar":
                         // cuidar habilidades
-                        rodadas++;
-                        atacar(personagem, inimigo);
+                        rodadas++;           
+                        // toda vez que for atacar, o inimigo tambem ataca  
+                        // primieiro o inimigo para janela ficar em baixo           
+                        atacar(inimigo, personagem, true);
+                        infoPersonagem.setText(personagem.toString());
+                        infoInimigo.setText(inimigo.toString());
+                        // depois o jogador para janela ficar em cima
+                        atacar(personagem, inimigo, false);
                         infoPersonagem.setText(personagem.toString());
                         infoInimigo.setText(inimigo.toString());
 
@@ -270,6 +276,7 @@ public class Tabuleiro extends JFrame {
                             frameBatalha.dispose();
                             frameVitoria.setVisible(true);
                         }
+
 
                         if (personagem.getUsouHabilidade()) {
                             if (personagem instanceof Guerreiro) {
@@ -306,23 +313,8 @@ public class Tabuleiro extends JFrame {
         frameBatalha.add(painel);
         frameBatalha.setVisible(true);
     }
-/*
- *  Matar um monstro  ganhar algum atributo aleatorio (vida, defesa, ataque)
- *  
- *  Durante o ataque, duas opções:
- *  - Atacar
- *      primeiro = ataca sorteando um numero de 0 a W e somando ao seu valor de ataque
- *      segundo = se defende sorteando um numero de 0 a W e somando ao seu valor de defesa
- *          O dano é o valor do ataque menos o valor da defesa
- *              dano > 0 segundo leva
- *              dano < 0 primeiro leva
- * 
- *      Só acaba quando algum morrer
- *  - Usar habilidade especial
- *  - ingerir elixir
- */
 
-    private void atacar(Personagem personagem, Personagem inimigo){
+    private void atacar(Personagem personagem, Personagem inimigo, boolean inverterPapeis){
         Random random = new Random();
         int ataque = personagem.getAtaque() + random.nextInt(50);
         int defesa = inimigo.getDefesa() + random.nextInt(50);
@@ -336,15 +328,19 @@ public class Tabuleiro extends JFrame {
         JPanel painel = new JPanel();
         painel.setLayout(new BorderLayout());
         
-        String texto = "Você atacou o inimigo...";
+        String texto = !inverterPapeis ? "Você atacou o inimigo..." : "Inimigo atacou você...";
         JLabel legenda = new JLabel(texto);
         legenda.setHorizontalAlignment(SwingConstants.CENTER);
         painel.add(legenda, BorderLayout.NORTH);
         
-        String texto2 = "O inimigo levou " + dano + " de dano!";
+        //String texto2 = "O inimigo levou " + dano + " de dano!";
+        String texto2 = !inverterPapeis ? "O inimigo levou " + dano + " de dano!" 
+                                       : "Você levou " + dano + " de dano!";
         if (dano < 0) {
             dano = Math.abs(dano);
-            texto2 = "O inimigo conseguiu se defender e você levou " + dano + " de dano!";
+            //texto2 = "O inimigo conseguiu se defender e você levou " + dano + " de dano!";
+            texto2 = !inverterPapeis ? "O inimigo conseguiu se defender e você levou " + dano + " de dano!"
+                                    : "Você conseguiu se defender e o inimigo levou " + dano + " de dano!";
             personagem.levaDano(dano);  
         } else {
             inimigo.levaDano(dano);
