@@ -101,13 +101,13 @@ public class TelaInicial extends JFrame {
         Tabuleiro tabuleiro;
         switch (personagem) {
             case "Barbaro":
-                tabuleiro = new Tabuleiro(new Barbaro(100, 100, 100));
+                tabuleiro = new Tabuleiro(new Barbaro(30, 20, 100));
                 break;
             case "Guerreiro":
-                tabuleiro = new Tabuleiro(new Guerreiro(100, 100, 100));
+                tabuleiro = new Tabuleiro(new Guerreiro(30, 20, 100));
                 break;
             case "Paladino":
-                tabuleiro = new Tabuleiro(new Paladino(100, 100, 100));
+                tabuleiro = new Tabuleiro(new Paladino(30, 20, 100));
                 break;
             default:
                 throw new IllegalArgumentException("Personagem inválido");

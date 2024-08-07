@@ -20,6 +20,7 @@ public class Tabuleiro extends JFrame {
     private int CHANCE_CENARIO = 20;
     private int CHANCE_ELIXIR = 45;
     private int CHANCE_ARMADILHA_ALEATORIA = 20;
+    private int BONUS_VITORIA = 25;
     private int DANO_BASE = 111;
     private int posicaoX = 0;
     private int posicaoY = 0;
@@ -59,13 +60,13 @@ public class Tabuleiro extends JFrame {
             int num = random.nextInt(10);
             // se for a linha do chefão
             if (i == 4) {
-                this.tabuleiro[i][num] = new Casa( new Chefao(100, 100, 1000));
+                this.tabuleiro[i][num] = new Casa( new Chefao(40, 130, 200));
             } else {
                 if (i == 0 && num == 0) {
                     // não deixa colocar um monstro na primeira posição
                     num = num + 2;
                 }
-                this.tabuleiro[i][num] = new Casa( new Monstro(100, 100, 150));
+                this.tabuleiro[i][num] = new Casa( new Monstro(15, 10, 50));
             }
         }
         this.backupTabuleiro = copiarTabuleiro(this.tabuleiro);
@@ -265,18 +266,37 @@ public class Tabuleiro extends JFrame {
 
                         if (inimigo.getSaude() <= 0) {
                             rodadas = 0;
+                            Random random = new Random();
                             JFrame frameVitoria = new JFrame("Vitória");
-                            frameVitoria.setSize(250, 200);
+                            frameVitoria.setSize(325, 200);
                             frameVitoria.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                             frameVitoria.setLocationRelativeTo(null);
+                            // retira habilidade antes de somar o bonus
+                            personagem.retirarHabilidade();
+                            // numero aleatorio entre 0 e 29
+                            int atributo = random.nextInt(30);
+                            String legenda = "Você derrotou o inimigo! ";
 
-                            JLabel vitoria = new JLabel("Você derrotou o inimigo!");
+                            if (atributo < 10) {
+                                // se for de 0 a 9 jogador recebe pontos de ataque
+                                legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de ataque.");
+                                personagem.addAtaque(BONUS_VITORIA);
+                            } else if (atributo < 20) {
+                                // se for de 10 a 19 recebe defesa
+                                legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de defesa.");
+                                personagem.addDefesa(BONUS_VITORIA);
+                            } else {
+                                // se for maior que 20
+                                legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de saúde.");
+                                personagem.addSaude(BONUS_VITORIA);
+                            }
+
+                            JLabel vitoria = new JLabel(legenda);
                             vitoria.setHorizontalAlignment(SwingConstants.CENTER);
                             frameVitoria.add(vitoria);
                             frameBatalha.dispose();
                             frameVitoria.setVisible(true);
                         }
-
 
                         if (personagem.getUsouHabilidade()) {
                             if (personagem instanceof Guerreiro) {
@@ -316,8 +336,8 @@ public class Tabuleiro extends JFrame {
 
     private void atacar(Personagem personagem, Personagem inimigo, boolean inverterPapeis){
         Random random = new Random();
-        int ataque = personagem.getAtaque() + random.nextInt(50);
-        int defesa = inimigo.getDefesa() + random.nextInt(50);
+        int ataque = personagem.getAtaque() + random.nextInt(10);
+        int defesa = inimigo.getDefesa() + random.nextInt(10);
         int dano = ataque - defesa;
 
         JFrame frameAtaque = new JFrame("Ataque");
@@ -333,12 +353,10 @@ public class Tabuleiro extends JFrame {
         legenda.setHorizontalAlignment(SwingConstants.CENTER);
         painel.add(legenda, BorderLayout.NORTH);
         
-        //String texto2 = "O inimigo levou " + dano + " de dano!";
         String texto2 = !inverterPapeis ? "O inimigo levou " + dano + " de dano!" 
                                        : "Você levou " + dano + " de dano!";
         if (dano < 0) {
             dano = Math.abs(dano);
-            //texto2 = "O inimigo conseguiu se defender e você levou " + dano + " de dano!";
             texto2 = !inverterPapeis ? "O inimigo conseguiu se defender e você levou " + dano + " de dano!"
                                     : "Você conseguiu se defender e o inimigo levou " + dano + " de dano!";
             personagem.levaDano(dano);  

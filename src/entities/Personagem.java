@@ -35,6 +35,10 @@ public abstract class Personagem {
         this.ataque = ataque;
     }
 
+    public void addAtaque(int ataque) {
+        this.ataque += ataque;
+    }
+
     public int getDefesa() {
         return defesa;
     }
@@ -43,12 +47,20 @@ public abstract class Personagem {
         this.defesa = defesa;
     }
 
+    public void addDefesa(int defesa) {
+        this.defesa += defesa;
+    }
+
     public int getSaude() {
         return saude;
     }
 
     public void setSaude(int saude) {
         this.saude = saude;
+    }
+
+    public void addSaude(int saude) {
+        this.saude += saude;
     }
 
     public String getNome() {
