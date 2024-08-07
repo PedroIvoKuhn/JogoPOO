@@ -18,42 +18,40 @@ public class Casa extends JButton{
     private boolean ocupado = false;
     
     public Casa() {
+        setIcon(new ImageIcon("img/mato.png"));
+        setBackground(Color.WHITE);
     }
 
-    public Casa(Personagem personagem) {
+    public Casa(Personagem personagem, boolean debug) {
         this.personagem = personagem;
         this.armadilha = null;
         this.elixir = null;
         this.ocupado = true;
 
-        String temp = getTipoPersonagem(personagem);
-        if (temp == "N"){ // se por agum motivo não for uma das opções o icone sera do guerreiro
-            ImageIcon icon = new ImageIcon("img/guerreiro.png");
-            setIcon(icon);
-            setBackground(Color.GREEN);
-        }
-        
+        setIconPersonagem(personagem, debug); 
     }
 
-    public Casa(Armadilha armadilha) {
-        ImageIcon icon = new ImageIcon("img/bomb.png");
+    public Casa(Armadilha armadilha, boolean debug) {
+        ImageIcon icon = debug ? new ImageIcon("img/bomb.png") 
+                               : new ImageIcon("img/mato.png");
         setIcon(icon);
 
         this.personagem = null;
         this.armadilha = armadilha;
         this.ocupado = true;
-        setBackground(Color.RED);
+        setBackground(debug ? Color.RED : Color.WHITE);
     }
 
-    public Casa(Elixir elixir) {
-        ImageIcon icon = new ImageIcon("img/elixir.png");
+    public Casa(Elixir elixir, boolean debug) {
+        ImageIcon icon = debug ? new ImageIcon("img/elixir.png")
+                               : new ImageIcon("img/mato.png");
         setIcon(icon);
 
         this.personagem = null;
         this.armadilha = null;
         this.elixir = elixir;
         this.ocupado = true;
-        setBackground(Color.GRAY);
+        setBackground(debug ? Color.GRAY : Color.WHITE);
     }
 
     public Personagem getPersonagem() {
@@ -81,42 +79,44 @@ public class Casa extends JButton{
         this.ocupado = ocupado;
     }
 
-    public String getTipoPersonagem(Personagem personagem) {
+    public void setIconPersonagem(Personagem personagem, boolean debug) {
+        ImageIcon icon;
         if (personagem instanceof Chefao) {
-            ImageIcon icon = new ImageIcon("img/chefao.png");
-            setIcon(icon);
+            icon = new ImageIcon("img/chefao.png");
             setBackground(Color.CYAN);
-            return "C";
         } else if (personagem instanceof Monstro) {
-            ImageIcon icon = new ImageIcon("img/monstro.png");
-            setIcon(icon);
-            setBackground(Color.ORANGE);
-            return "M";
+            if (debug) {
+                icon = new ImageIcon("img/monstro.png");
+                setBackground(Color.ORANGE);
+            } else {
+                icon = new ImageIcon("img/mato.png");
+                setBackground(Color.WHITE);
+            }
         } else if (personagem instanceof Guerreiro){
-            ImageIcon icon = new ImageIcon("img/guerreiro.png");
-            setIcon(icon);
+            icon = new ImageIcon("img/guerreiro.png");
             setBackground(Color.GREEN);
-            return "G";
         } else if (personagem instanceof Paladino){
-            ImageIcon icon = new ImageIcon("img/paladino.png");
-            setIcon(icon);
+            icon = new ImageIcon("img/paladino.png");
             setBackground(Color.GREEN);
-            return "P";
         } else if (personagem instanceof Barbaro){
-            ImageIcon icon = new ImageIcon("img/barbaro.png");
-            setIcon(icon);
+            icon = new ImageIcon("img/barbaro.png");
             setBackground(Color.GREEN);
-            return "B";
+        } else {
+            icon = new ImageIcon("img/guerreiro.png");
+            setBackground(Color.GREEN);
         }
-        return "N";
+        setIcon(icon);
     }
 
     public void setPersonagem(Personagem personagem){
         this.personagem = personagem;
-        if (getTipoPersonagem(personagem) == "N") {
-            setIcon(null);
-            setBackground(null);
+        if (personagem != null){
+            setIconPersonagem(personagem, false);
+            setBackground(Color.GREEN);
+            return;
         }
+        setIcon(null);
+        setBackground(Color.WHITE);
     }
 
     public String getTipoConteudo(){

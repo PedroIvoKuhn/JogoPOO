@@ -35,15 +35,14 @@ public class TelaInicial extends JFrame {
         botaoJogar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                escolherPersonagem();
+                escolherPersonagem(false);
             }
         });
-
+        
         botaoDebug.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Código para debug
-                JOptionPane.showMessageDialog(null, "Modo Debug ativado!");
+                escolherPersonagem(true);
             }
         });
 
@@ -55,7 +54,7 @@ public class TelaInicial extends JFrame {
         });
     }
 
-    private void escolherPersonagem() {
+    private void escolherPersonagem(boolean debug) {
         JFrame frameDoPersonagem = new JFrame("Escolha seu Personagem");
         frameDoPersonagem.setSize(300, 200);
         frameDoPersonagem.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -83,7 +82,7 @@ public class TelaInicial extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String personagem = e.getActionCommand();
                 try {
-                    startGame(personagem);
+                    startGame(personagem, debug);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -97,17 +96,17 @@ public class TelaInicial extends JFrame {
         paladino.addActionListener(actionListener);
     }
 
-    private void startGame(String personagem) throws Exception {
+    private void startGame(String personagem, boolean debug) throws Exception {
         Tabuleiro tabuleiro;
         switch (personagem) {
             case "Barbaro":
-                tabuleiro = new Tabuleiro(new Barbaro(30, 20, 100));
+                tabuleiro = new Tabuleiro(new Barbaro(30, 20, 100), debug);
                 break;
             case "Guerreiro":
-                tabuleiro = new Tabuleiro(new Guerreiro(30, 20, 100));
+                tabuleiro = new Tabuleiro(new Guerreiro(30, 20, 100), debug);
                 break;
             case "Paladino":
-                tabuleiro = new Tabuleiro(new Paladino(30, 20, 100));
+                tabuleiro = new Tabuleiro(new Paladino(30, 20, 100), debug);
                 break;
             default:
                 throw new IllegalArgumentException("Personagem inválido");

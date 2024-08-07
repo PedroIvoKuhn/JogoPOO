@@ -15,39 +15,43 @@ import entities.personagens.Monstro;
 
 
 public class Tabuleiro extends JFrame {
+    private boolean debug;
     private Casa[][] tabuleiro = new Casa[5][10];
     private Casa[][] backupTabuleiro = new Casa[5][10];
     private int CHANCE_CENARIO = 20;
     private int CHANCE_ELIXIR = 45;
     private int CHANCE_ARMADILHA_ALEATORIA = 20;
     private int BONUS_VITORIA = 25;
-    private int DANO_BASE = 111;
+    private int DANO_BASE = 1;
     private int posicaoX = 0;
     private int posicaoY = 0;
     int rodadas = 0;
+    int dicas = 3;
 
     JPanel pTela = new JPanel( new GridLayout(5, 10));
     JLabel informacoes;
+    JButton dica;
     
     // gerando o tabuleiro
-    public Tabuleiro(Personagem personagem) {
+    public Tabuleiro(Personagem personagem, boolean debug) {
+        this.debug = debug;
         Random random = new Random();
         for (int i = 0; i < tabuleiro.length; i++) {
             for (int j = 0; j < tabuleiro[i].length; j++) {
                 if (i == 0 && j == 0) {
                     // inicia o personagem na primeira casa
-                    this.tabuleiro[i][j] = new Casa(personagem);
+                    this.tabuleiro[i][j] = new Casa(personagem, debug);
                     // adiciona armadilha ou elixir de acordo com a probabilidade
                 } else if (probabilidade(CHANCE_CENARIO)) {
                     if (probabilidade(CHANCE_ELIXIR)) {
-                        this.tabuleiro[i][j] = new Casa( new Elixir(100));
+                        this.tabuleiro[i][j] = new Casa( new Elixir(100), debug);
                     } else {
                         // se não for elixir é armadilha
                         if (probabilidade(CHANCE_ARMADILHA_ALEATORIA)) {
-                            // adiciona um numero aleatorio entre 0 e 50
-                            this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE + random.nextInt(51)));
+                            // adiciona um numero aleatorio entre 0 e 10
+                            this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE + random.nextInt(10)), debug);
                         } else {
-                            this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE));
+                            this.tabuleiro[i][j] = new Casa( new Armadilha(DANO_BASE), debug);
                         }
                     }
                 } else {
@@ -60,13 +64,13 @@ public class Tabuleiro extends JFrame {
             int num = random.nextInt(10);
             // se for a linha do chefão
             if (i == 4) {
-                this.tabuleiro[i][num] = new Casa( new Chefao(40, 130, 200));
+                this.tabuleiro[i][num] = new Casa( new Chefao(40, 30, 200), debug);
             } else {
                 if (i == 0 && num == 0) {
                     // não deixa colocar um monstro na primeira posição
                     num = num + 2;
                 }
-                this.tabuleiro[i][num] = new Casa( new Monstro(15, 10, 50));
+                this.tabuleiro[i][num] = new Casa( new Monstro(15, 10, 50), debug);
             }
         }
         this.backupTabuleiro = copiarTabuleiro(this.tabuleiro);
@@ -102,6 +106,16 @@ public class Tabuleiro extends JFrame {
         }
 
         add(pTela, BorderLayout.CENTER);
+
+        String textoDica = dicas + " dicas restantes.";
+        dica = new JButton(textoDica);
+        dica.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                usarDica();
+            }
+        });
+        add(dica, BorderLayout.SOUTH);
         setVisible(true);
     }
 
@@ -110,6 +124,83 @@ public class Tabuleiro extends JFrame {
         int randomNumber = random.nextInt(100);
         return randomNumber < chance;
     }
+
+    public void usarDica(){
+        dicas--;
+        dica.setText(dicas + " dicas restantes.");
+
+        JFrame frameDicas = new JFrame("Dica");
+        frameDicas.setSize(300, 200);
+        frameDicas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameDicas.setLocationRelativeTo(null);
+
+        JPanel painel = new JPanel();
+        painel.setLayout(new GridLayout(3,1));
+        
+        JButton linhas = new JButton("Armadilhas na linha atual?");
+        linhas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int encontrou = 0;
+                 for (int i = 0; i < tabuleiro[posicaoX].length; i++) {
+                    if (tabuleiro[posicaoX][i].getTipoConteudo() == "A") {
+                        encontrou++;
+                    }
+                }
+                JFrame frameNumBombas = new JFrame("Vitória");
+                frameNumBombas.setSize(325, 200);
+                frameNumBombas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frameNumBombas.setLocationRelativeTo(null);
+
+                JLabel bombas = new JLabel(encontrou + " bombas nessa linha.");
+                bombas.setHorizontalAlignment(SwingConstants.CENTER);
+                frameNumBombas.add(bombas);
+                frameDicas.dispose();
+                frameNumBombas.setVisible(true);
+            }
+        });
+        painel.add(linhas);
+        
+        JButton colunas = new JButton("Armadilhas na coluna atual?");
+        colunas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int encontrou = 0;
+                for (int i = 0; i < tabuleiro.length; i++) {
+                    if (tabuleiro[i][posicaoY].getTipoConteudo() == "A") {
+                        encontrou++;
+                    }
+                }
+                JFrame frameNumBombas = new JFrame("Vitória");
+                frameNumBombas.setSize(325, 200);
+                frameNumBombas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frameNumBombas.setLocationRelativeTo(null);
+
+                JLabel bombas = new JLabel(encontrou + " bombas nessa coluna.");
+                bombas.setHorizontalAlignment(SwingConstants.CENTER);
+                frameNumBombas.add(bombas);
+                frameDicas.dispose();
+                frameNumBombas.setVisible(true);
+            }
+        });
+        painel.add(colunas);
+
+        JButton botaoFechar = new JButton("Sair");
+        botaoFechar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 frameDicas.dispose();
+            }
+        });
+
+        painel.add(botaoFechar);
+        frameDicas.add(painel);
+        
+        if (dicas == 0) {
+            dica.setEnabled(false);
+        }
+        frameDicas.setVisible(true);
+    }  
 
     public void printTabuleiro(){
         System.out.print("\033[H\033[2J");  
@@ -200,7 +291,7 @@ public class Tabuleiro extends JFrame {
     private void achouInimigo(Personagem personagem, Personagem inimigo){
         JFrame frameBatalha = new JFrame("Inimigo");
         frameBatalha.setSize(400, 400);
-        frameBatalha.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameBatalha.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frameBatalha.setLocationRelativeTo(null);
 
         JPanel painel = new JPanel();
@@ -272,7 +363,9 @@ public class Tabuleiro extends JFrame {
                             frameVitoria.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                             frameVitoria.setLocationRelativeTo(null);
                             // retira habilidade antes de somar o bonus
-                            personagem.retirarHabilidade();
+                            if (personagem.getUsouHabilidade()) {
+                                personagem.retirarHabilidade();
+                            }
                             // numero aleatorio entre 0 e 29
                             int atributo = random.nextInt(30);
                             String legenda = "Você derrotou o inimigo! ";
@@ -494,13 +587,13 @@ public class Tabuleiro extends JFrame {
                     case "P":   // Personagem
                         Personagem temp = original[i][j].getPersonagem();
                         temp.redefinirValores();
-                        copia[i][j] = new Casa(temp);
+                        copia[i][j] = new Casa(temp, this.debug);
                         break;
                     case "A":   // Armadilha
-                        copia[i][j] = new Casa(original[i][j].getArmadilha());
+                        copia[i][j] = new Casa(original[i][j].getArmadilha(), this.debug);
                         break;
                     case "E":   // Elixir
-                        copia[i][j] = new Casa(original[i][j].getElixir());
+                        copia[i][j] = new Casa(original[i][j].getElixir(), this.debug);
                         break;
                     default:
                         copia[i][j] = new Casa();
