@@ -16,6 +16,7 @@ import entities.personagens.Monstro;
 
 public class Tabuleiro extends JFrame {
     private boolean debug;
+    private boolean emCombate;
     private Casa[][] tabuleiro = new Casa[5][10];
     private Casa[][] backupTabuleiro = new Casa[5][10];
     private int CHANCE_CENARIO = 20;
@@ -215,7 +216,7 @@ public class Tabuleiro extends JFrame {
 
     private void moverJogador(int novoX, int novoY) {
         // se a posicao for uma ao lado da posicao do personagem
-        if (Math.abs(novoX - posicaoX) + Math.abs(novoY - posicaoY) == 1) {
+        if (Math.abs(novoX - posicaoX) + Math.abs(novoY - posicaoY) == 1 && !emCombate) {
 
             Casa atual = tabuleiro[posicaoX][posicaoY];
             Casa nova = tabuleiro[novoX][novoY];
@@ -293,6 +294,7 @@ public class Tabuleiro extends JFrame {
         frameBatalha.setSize(400, 400);
         frameBatalha.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frameBatalha.setLocationRelativeTo(null);
+        emCombate = true;
 
         JPanel painel = new JPanel();
         painel.setLayout(new BorderLayout());
@@ -350,45 +352,53 @@ public class Tabuleiro extends JFrame {
                         infoPersonagem.setText(personagem.toString());
                         infoInimigo.setText(inimigo.toString());
 
+                        // se o jogador morreu
                         if (personagem.getSaude() <= 0) {
                             frameBatalha.dispose();
                             telafinal("Você morreu em combate!");
                         }
 
+                        // se o inimigo morrreu
                         if (inimigo.getSaude() <= 0) {
-                            rodadas = 0;
-                            Random random = new Random();
-                            JFrame frameVitoria = new JFrame("Vitória");
-                            frameVitoria.setSize(325, 200);
-                            frameVitoria.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                            frameVitoria.setLocationRelativeTo(null);
-                            // retira habilidade antes de somar o bonus
-                            if (personagem.getUsouHabilidade()) {
-                                personagem.retirarHabilidade();
-                            }
-                            // numero aleatorio entre 0 e 29
-                            int atributo = random.nextInt(30);
-                            String legenda = "Você derrotou o inimigo! ";
-
-                            if (atributo < 10) {
-                                // se for de 0 a 9 jogador recebe pontos de ataque
-                                legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de ataque.");
-                                personagem.addAtaque(BONUS_VITORIA);
-                            } else if (atributo < 20) {
-                                // se for de 10 a 19 recebe defesa
-                                legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de defesa.");
-                                personagem.addDefesa(BONUS_VITORIA);
+                            if (inimigo instanceof Chefao) {
+                                frameBatalha.dispose();
+                                telafinal("Você ganhou o jogo! Parabéns");
                             } else {
-                                // se for maior que 20
-                                legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de saúde.");
-                                personagem.addSaude(BONUS_VITORIA);
+                                emCombate = false;
+                                rodadas = 0;
+                                Random random = new Random();
+                                JFrame frameVitoria = new JFrame("Vitória");
+                                frameVitoria.setSize(325, 200);
+                                frameVitoria.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                                frameVitoria.setLocationRelativeTo(null);
+                                // retira habilidade antes de somar o bonus
+                                if (personagem.getUsouHabilidade()) {
+                                    personagem.retirarHabilidade();
+                                }
+                                // numero aleatorio entre 0 e 29
+                                int atributo = random.nextInt(30);
+                                String legenda = "Você derrotou o inimigo! ";
+                                
+                                if (atributo < 10) {
+                                    // se for de 0 a 9 jogador recebe pontos de ataque
+                                    legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de ataque.");
+                                    personagem.addAtaque(BONUS_VITORIA);
+                                } else if (atributo < 20) {
+                                    // se for de 10 a 19 recebe defesa
+                                    legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de defesa.");
+                                    personagem.addDefesa(BONUS_VITORIA);
+                                } else {
+                                    // se for maior que 20
+                                    legenda = legenda.concat("Bonus: " + BONUS_VITORIA + " de saúde.");
+                                    personagem.addSaude(BONUS_VITORIA);
+                                }
+                                
+                                JLabel vitoria = new JLabel(legenda);
+                                vitoria.setHorizontalAlignment(SwingConstants.CENTER);
+                                frameVitoria.add(vitoria);
+                                frameBatalha.dispose();
+                                frameVitoria.setVisible(true);
                             }
-
-                            JLabel vitoria = new JLabel(legenda);
-                            vitoria.setHorizontalAlignment(SwingConstants.CENTER);
-                            frameVitoria.add(vitoria);
-                            frameBatalha.dispose();
-                            frameVitoria.setVisible(true);
                         }
 
                         if (personagem.getUsouHabilidade()) {
