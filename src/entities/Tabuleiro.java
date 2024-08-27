@@ -148,7 +148,7 @@ public class Tabuleiro extends JFrame {
                         encontrou++;
                     }
                 }
-                JFrame frameNumBombas = new JFrame("Vitória");
+                JFrame frameNumBombas = new JFrame("Dica");
                 frameNumBombas.setSize(325, 200);
                 frameNumBombas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frameNumBombas.setLocationRelativeTo(null);
@@ -172,7 +172,7 @@ public class Tabuleiro extends JFrame {
                         encontrou++;
                     }
                 }
-                JFrame frameNumBombas = new JFrame("Vitória");
+                JFrame frameNumBombas = new JFrame("Dica");
                 frameNumBombas.setSize(325, 200);
                 frameNumBombas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frameNumBombas.setLocationRelativeTo(null);
@@ -247,7 +247,7 @@ public class Tabuleiro extends JFrame {
             posicaoY = novoY;
     
     
-            informacoes.setText(nova.getPersonagem().toString());;
+            informacoes.setText(nova.getPersonagem().toString());
             pTela.repaint();
         }
     }
